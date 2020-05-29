@@ -25,7 +25,7 @@ try:
     x = pd.DataFrame({'A': [1, 2, 3]})
     x.drop_duplicates(subset='A')
 except TypeError:
-    raise ImportError('SUPERGNOVA requires pandas version > 0.15.2')
+    raise ImportError('HYPERGNOVA requires pandas version > 0.15.2')
 
 
 pd.set_option('display.max_rows', 500)
