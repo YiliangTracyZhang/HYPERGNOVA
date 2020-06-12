@@ -72,15 +72,15 @@ def prep(bfile1, bfile2, partition, sumstats1, sumstats2, N1, N2):
         for file in [sumstats1, sumstats2]]
 
     # rename cols
-    bim1.rename(columns={'A1': 'A1_ref1', 'A2': 'A2_ref1'}, inplace=True)
-    bim2.rename(columns={'A1': 'A1_ref2', 'A2': 'A2_ref2'}, inplace=True)
+    bim1.rename(columns={'CHR': 'CHR_ref1', 'CM': 'CM_ref1', 'BP':'BP_ref1', 'A1': 'A1_ref1', 'A2': 'A2_ref1'}, inplace=True)
+    bim2.rename(columns={'CHR': 'CHR_ref2', 'CM': 'CM_ref2', 'BP':'BP_ref2', 'A1': 'A1_ref2', 'A2': 'A2_ref2'}, inplace=True)
     dfs[0].rename(columns={'A1': 'A1_x', 'A2': 'A2_x', 'N': 'N_x', 'Z': 'Z_x'},
         inplace=True)
     dfs[1].rename(columns={'A1': 'A1_y', 'A2': 'A2_y', 'N': 'N_y', 'Z': 'Z_y'},
         inplace=True)
 
     # take overlap between output and ref genotype files
-    df = pd.merge(bim, dfs[1], on=['SNP']).merge(dfs[0], on=['SNP'])
+    df = pd.merge(bim1, bim2, on=['SNP']).merge(dfs[1], on=['SNP']).merge(dfs[0], on=['SNP'])
     # flip sign of z-score for allele reversals
     allign_alleles(df)
     df = df.drop_duplicates(subset='SNP', keep=False)
