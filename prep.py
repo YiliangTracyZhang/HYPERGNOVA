@@ -98,4 +98,5 @@ def prep(bfile1, bfile2, partition, sumstats1, sumstats2, N1, N2):
         N2 = N2
     else:
         N2 = dfs[1]['N_y'].max()
+    df.rename(columns={'CHR_ref1':'CHR'}, inplace=True)
     return (df[['CHR', 'SNP', 'Z_x', 'Z_y']], reversed_alleles_ref, bed, N1, N2)
