@@ -61,10 +61,8 @@ def pipeline(args):
     print('Calculating heritability...')
     h_1, h_2 = heritability(gwas_snps, ld_scores1, ld_scores2, N1, N2)
     print('The genome-wide heritability of the first trait is {}.\nThe genome-wide heritability of the second trait is {}.'.format(h_1, h_2))
-    print('Calculating phenotypic correlation...')
-    pheno_corr, pheno_corr_var = pheno(gwas_snps, ld_scores, N1, N2, h_1, h_2)
     print('Calculating local genetic covariance...')
-    out = calculate(args.bfile, bed, args.thread, gwas_snps, ld_scores, N1, N2, pheno_corr, pheno_corr_var)
+    out = calculate(args.bfile, bed, args.thread, gwas_snps, reversed_alleles_ref, N1, N2, args.genome_wide)
     out.to_csv(args.out, sep=' ', na_rep='NA', index=False)
 
 
@@ -92,7 +90,7 @@ parser.add_argument('--out', required=True, type=str,
     help='Location to output results.')
 parser.add_argument('--thread', default= multiprocessing.cpu_count(), type=int,
     help='Thread numbers used for calculation. Default = CPU numbers.')
-parser.add_argument('--global', default= False, action='store_true',
+parser.add_argument('--genome_wide', default= False, action='store_true',
     help='Whether to estimate global genetic covariance. Default = F')
 
 if __name__ == '__main__':

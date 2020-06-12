@@ -175,7 +175,7 @@ def _supergnova(bfile, partition, thread, gwas_snps, ld_scores, n1, n2, pheno_co
     df = df.astype(convert_dict)
     return df
 
-def calculate(bfile, partition, thread, gwas_snps, ld_scores, n1, n2, pheno_corr, pheno_corr_var):
+def calculate(bfile, partition, thread, gwas_snps, reversed_alleles_ref, n1, n2, genome_wide):
     if thread is None:
         thread = multiprocessing.cpu_count()
         print('{C} CPUs are detected. Using {C} threads in computation  ... '.format(C=str(thread)))
