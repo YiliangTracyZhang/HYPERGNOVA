@@ -17,7 +17,6 @@ import numpy as np
 from prep import prep
 from ldsc_thin import ldscore
 from heritability import heritability
-from pheno import pheno
 from calculate import calculate
 
 
@@ -56,13 +55,15 @@ def pipeline(args):
     ld_scores2 = ldscore(args.bfile2, gwas_snps)
     ld_scores1 = ld_scores1[ld_scores1['SNP'].isin(ld_scores2['SNP'])]
     ld_scores2 = ld_scores2[ld_scores2['SNP'].isin(ld_scores1['SNP'])]
-    gwas_snps = gwas_snps[gwas_snps['SNP'].isin(ld_scores1['SNP'])]
+    subset_index = gwas_snps['SNP'].isin(ld_scores1['SNP'])
+    gwas_snps = gwas_snps[subset_index]
+    reversed_alleles_ref = reversed_alleles_ref[subset_index]
     print('{} SNPs included in our analysis...'.format(len(gwas_snps)))
     print('Calculating heritability...')
     h_1, h_2 = heritability(gwas_snps, ld_scores1, ld_scores2, N1, N2)
     print('The genome-wide heritability of the first trait is {}.\nThe genome-wide heritability of the second trait is {}.'.format(h_1, h_2))
     print('Calculating local genetic covariance...')
-    out = calculate(args.bfile, bed, args.thread, gwas_snps, reversed_alleles_ref, N1, N2, args.genome_wide)
+    out = calculate(args.bfile1, args.bfile2, bed, args.thread, gwas_snps, reversed_alleles_ref, N1, N2, args.genome_wide)
     out.to_csv(args.out, sep=' ', na_rep='NA', index=False)
 
 
@@ -90,8 +91,8 @@ parser.add_argument('--out', required=True, type=str,
     help='Location to output results.')
 parser.add_argument('--thread', default= multiprocessing.cpu_count(), type=int,
     help='Thread numbers used for calculation. Default = CPU numbers.')
-parser.add_argument('--genome_wide', default= False, action='store_true',
-    help='Whether to estimate global genetic covariance. Default = F')
+#parser.add_argument('--genome_wide', default= False, action='store_true',
+#    help='Whether to estimate global genetic covariance. Default = F')
 
 if __name__ == '__main__':
     pipeline(parser.parse_args())

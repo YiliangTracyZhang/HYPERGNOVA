@@ -175,7 +175,7 @@ def _supergnova(bfile, partition, thread, gwas_snps, ld_scores, n1, n2, pheno_co
     df = df.astype(convert_dict)
     return df
 
-def calculate(bfile, partition, thread, gwas_snps, reversed_alleles_ref, n1, n2, genome_wide):
+def calculate(bfile1, bfile2, partition, thread, gwas_snps, reversed_alleles_ref, n1, n2, genome_wide):
     if thread is None:
         thread = multiprocessing.cpu_count()
         print('{C} CPUs are detected. Using {C} threads in computation  ... '.format(C=str(thread)))
@@ -185,15 +185,15 @@ def calculate(bfile, partition, thread, gwas_snps, reversed_alleles_ref, n1, n2,
         print('{C} CPUs are detected. Using {N} threads in computation  ... '.format(C=str(cpuNum), N=str(thread)))
 
     df = None
-    if '@' in bfile:
+    if '@' in bfile1:
         all_dfs = []
         chrs = list(set(partition.iloc[:,0]))
         for i in range(len(chrs)):
             cur_bfile = bfile.replace('@', str(chrs[i]))
-            all_dfs.append(_supergnova(cur_bfile, partition, thread, gwas_snps, ld_scores, n1, n2, pheno_corr, pheno_corr_var))
+            all_dfs.append(_supergnova(cur_bfile, partition, thread, gwas_snps, ld_scores, n1, n2))
             print('Computed local genetic covariance for chromosome {}'.format(chrs[i]))
         df = pd.concat(all_dfs, ignore_index=True)
     else:
-        df = _supergnova(bfile, partition, thread, gwas_snps, ld_scores, n1, n2, pheno_corr, pheno_corr_var)
+        df = _supergnova(bfile, partition, thread, gwas_snps, ld_scores, n1, n2)
     
     return df
