@@ -46,15 +46,22 @@ def get_files(file_name):
             ValueError('No files matching {}'.format(file_name))
 
 
-def prep(bfile, partition, sumstats1, sumstats2, N1, N2):
-    bim_files = get_files(bfile + '.bim')
+def prep(bfile1, bfile2, partition, sumstats1, sumstats2, N1, N2):
+    bim_files1 = get_files(bfile1 + '.bim')
+    bim_files2 = get_files(bfile2 + '.bim')
     bed_files = get_files(partition)
     # read in bim files
-    bims = [pd.read_csv(f,
+    bims1 = [pd.read_csv(f,
                         header=None,
                         names=['CHR', 'SNP', 'CM', 'BP', 'A1', 'A2'],
-                        delim_whitespace=True) for f in bim_files]
-    bim = pd.concat(bims, ignore_index=True)
+                        delim_whitespace=True) for f in bim_files1]
+    bims2 = [pd.read_csv(f,
+                        header=None,
+                        names=['CHR', 'SNP', 'CM', 'BP', 'A1', 'A2'],
+                        delim_whitespace=True) for f in bim_files2]
+
+    bim1 = pd.concat(bims1, ignore_index=True)
+    bim2 = pd.concat(bims2, ignore_index=True)
 
     # read in bed files
     beds = [pd.read_csv(f,
@@ -65,7 +72,8 @@ def prep(bfile, partition, sumstats1, sumstats2, N1, N2):
         for file in [sumstats1, sumstats2]]
 
     # rename cols
-    bim.rename(columns={'A1': 'A1_ref', 'A2': 'A2_ref'}, inplace=True)
+    bim1.rename(columns={'A1': 'A1_ref1', 'A2': 'A2_ref1'}, inplace=True)
+    bim2.rename(columns={'A1': 'A1_ref2', 'A2': 'A2_ref2'}, inplace=True)
     dfs[0].rename(columns={'A1': 'A1_x', 'A2': 'A2_x', 'N': 'N_x', 'Z': 'Z_x'},
         inplace=True)
     dfs[1].rename(columns={'A1': 'A1_y', 'A2': 'A2_y', 'N': 'N_y', 'Z': 'Z_y'},

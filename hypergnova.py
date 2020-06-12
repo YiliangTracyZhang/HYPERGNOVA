@@ -49,7 +49,7 @@ def pipeline(args):
         raise ValueError('--out flag points to an invalid path.')
 
     print('Preparing files for analysis...')
-    gwas_snps, bed, N1, N2 = prep(args.bfile, args.partition, args.sumstats1, args.sumstats2, args.N1, args.N2)
+    gwas_snps, bed, N1, N2 = prep(args.bfile1, args.bfile2, args.partition, args.sumstats1, args.sumstats2, args.N1, args.N2)
     print('Calculating LD scores...')
     ld_scores = ldscore(args.bfile, gwas_snps)
     gwas_snps = gwas_snps[gwas_snps['SNP'].isin(ld_scores['SNP'])]
@@ -71,8 +71,10 @@ parser.add_argument('sumstats1',
 parser.add_argument('sumstats2',
     help='The second sumstats file.')
 
-parser.add_argument('--bfile', required=True, type=str,
-    help='Prefix for Plink .bed/.bim/.fam file.')
+parser.add_argument('--bfile1', required=True, type=str,
+    help='Prefix for Plink .bed/.bim/.fam file of the sumstats1 file.')
+parser.add_argument('--bfile2', required=True, type=str,
+    help='Prefix for Plink .bed/.bim/.fam file of the sumstats2 file.')
 parser.add_argument('--partition', required=True, type=str,
     help='Genome partition file in bed format')
 parser.add_argument('--N1', type=int,
@@ -86,6 +88,8 @@ parser.add_argument('--out', required=True, type=str,
     help='Location to output results.')
 parser.add_argument('--thread', default= multiprocessing.cpu_count(), type=int,
     help='Thread numbers used for calculation. Default = CPU numbers.')
+parser.add_argument('--global', default= False, action='store_true',
+    help='Whether to estimate global genetic covariance. Default = F')
 
 if __name__ == '__main__':
     pipeline(parser.parse_args())
