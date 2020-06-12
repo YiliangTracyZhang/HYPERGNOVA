@@ -49,13 +49,17 @@ def pipeline(args):
         raise ValueError('--out flag points to an invalid path.')
 
     print('Preparing files for analysis...')
-    gwas_snps, bed, N1, N2 = prep(args.bfile1, args.bfile2, args.partition, args.sumstats1, args.sumstats2, args.N1, args.N2)
-    print('Calculating LD scores...')
-    ld_scores = ldscore(args.bfile, gwas_snps)
-    gwas_snps = gwas_snps[gwas_snps['SNP'].isin(ld_scores['SNP'])]
+    gwas_snps, reversed_alleles_ref, bed, N1, N2 = prep(args.bfile1, args.bfile2, args.partition, args.sumstats1, args.sumstats2, args.N1, args.N2)
+    print('Calculating LD scores for the first population...')
+    ld_scores1 = ldscore(args.bfile1, gwas_snps)
+    print('Calculating LD scores for the second population...')
+    ld_scores2 = ldscore(args.bfile2, gwas_snps)
+    ld_scores1 = ld_scores1[ld_scores1['SNP'].isin(ld_scores2['SNP'])]
+    ld_scores2 = ld_scores2[ld_scores2['SNP'].isin(ld_scores1['SNP'])]
+    gwas_snps = gwas_snps[gwas_snps['SNP'].isin(ld_scores1['SNP'])]
     print('{} SNPs included in our analysis...'.format(len(gwas_snps)))
     print('Calculating heritability...')
-    h_1, h_2 = heritability(gwas_snps, ld_scores, N1, N2)
+    h_1, h_2 = heritability(gwas_snps, ld_scores1, ld_scores2, N1, N2)
     print('The genome-wide heritability of the first trait is {}.\nThe genome-wide heritability of the second trait is {}.'.format(h_1, h_2))
     print('Calculating phenotypic correlation...')
     pheno_corr, pheno_corr_var = pheno(gwas_snps, ld_scores, N1, N2, h_1, h_2)
