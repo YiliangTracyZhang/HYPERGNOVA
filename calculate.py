@@ -144,13 +144,14 @@ def calGlobalCov(i, tmp_partition, geno_array1, geno_array2, coords, bps, tmp_gw
     max_dist = 1
     block_left = ld.getBlockLefts(tmp_coords, max_dist)
 
-    lN, blockLD = geno_array.ldCorrVarBlocks(block_left, idx)
-    lN = block_ld_scores["L2"]
-    meanLD = np.mean(lN)
-    local_LD = nearest_Corr(blockLD)
+    blockLD1 = geno_array1.ldCorrVarBlocks(block_left, idx)
+    local_LD1 = nearest_Corr(blockLD1)
+    blockLD2 = geno_array2.ldCorrVarBlocks(block_left, idx)
+    
+    local_LD2 = nearest_Corr(blockLD2)
 
-    d, v = linalg.eigh(local_LD)
-    order = d.argsort()[::-1]
+    d1, v1 = linalg.eigh(local_LD1)
+    order = d1.argsort()[::-1]
     d = d[order]
     v = v[:,order]
     if np.sum(d>0) < 120:
