@@ -147,10 +147,13 @@ def calGlobalCov(i, tmp_partition, geno_array1, geno_array2, coords, bps, tmp_gw
     blockLD1 = geno_array1.ldCorrVarBlocks(block_left, idx)
     local_LD1 = nearest_Corr(blockLD1)
     blockLD2 = geno_array2.ldCorrVarBlocks(block_left, idx)
-    
+    flip_multiply = block_flip * 2 - 1
+    blockLD2 = blockLD2 * flip_multiply
+    blockLD2 = blockLD2.T * flip_multiply
     local_LD2 = nearest_Corr(blockLD2)
 
     d1, v1 = linalg.eigh(local_LD1)
+    d2, v2 = linalg.eigh(local_LD2)
     order = d1.argsort()[::-1]
     d = d[order]
     v = v[:,order]
