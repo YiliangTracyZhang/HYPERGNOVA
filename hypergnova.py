@@ -91,8 +91,8 @@ parser.add_argument('--out', required=True, type=str,
     help='Location to output results.')
 parser.add_argument('--thread', default= multiprocessing.cpu_count(), type=int,
     help='Thread numbers used for calculation. Default = CPU numbers.')
-#parser.add_argument('--genome_wide', default= False, action='store_true',
-#    help='Whether to estimate global genetic covariance. Default = F')
+parser.add_argument('--genome_wide', default= False, action='store_true',
+    help='Whether to estimate global genetic covariance. Default = F')
 
 if __name__ == '__main__':
     pipeline(parser.parse_args())
