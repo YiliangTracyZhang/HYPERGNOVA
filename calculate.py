@@ -328,6 +328,8 @@ def calculate(bfile1, bfile2, partition, thread, gwas_snps, reversed_alleles_ref
         total_m = np.sum(df['m'])
         global_Cov = total_m / sqrt(n1 * n2) * np.sum(df['numerator'] / np.sum(df['denominator']))
         results = pd.DataFrame(OrderedDict({"rho":[global_Cov], "m":[total_m]}))
+        convert_dict = {"m":int}
+        results = results.astype(convert_dict)
         return results
     
     else:
