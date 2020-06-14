@@ -161,23 +161,27 @@ def calGlobalCov(i, tmp_partition, geno_array1, geno_array2, coords, bps, tmp_gw
     v1 = v1[:,order1]
     d2 = d2[order2]
     v2 = v2[:,order2]
-    if np.sum(d1>0) < 120 or np.sum(d2>0) < 120:
+    if np.sum(np.logical_and(d1>0, d2>0)) < 120:
         df = pd.DataFrame(OrderedDict({"numerator":[], "denominator":[], "m":[]}))
         return df
     
 
-    sub_d1 = d1[d1>0 and ]
-    sub_v1 = v1[:,d1>0]
+    sub_d1 = d1[np.logical_and(d1>0, d2>0)]
+    sub_v1 = v1[:,np.logical_and(d1>0, d2>0)]
 
-    sub_d2 = d2[d2>0]
-    sub_v2 = v2[:,d2>0]
+    sub_d2 = d2[np.logical_and(d1>0, d2>0)]
+    sub_v2 = v2[:,np.logical_and(d1>0, d2>0)]
 
-    tz1 = np.dot(sub_v.T, block_gwas_snps['Z_x'])
-    tz2 = np.dot(sub_v.T, block_gwas_snps['Z_y'])
+    tz1 = np.dot(sub_v1.T, block_gwas_snps['Z_x'])
+    tz2 = np.dot(sub_v2.T, block_gwas_snps['Z_y'])
     y = tz1 * tz2
-    sub_v = 
+    sub_v = sub_v1 * sub_v2
+    u = sub_v.sum(axis=0)
+    numerator = y.T.dot(u)
+    w = sub_d1 * sub_d2
+    denominator = w.T.dot(np.square(u))
 
-    df = pd.DataFrame(OrderedDict({"chr":[numerator], "start":[denominator], "m":[m0]}))
+    df = pd.DataFrame(OrderedDict({"numerator":[numerator], "denominator":[denominator], "m":[m0]}))
 
     return df
 
@@ -321,8 +325,10 @@ def calculate(bfile1, bfile2, partition, thread, gwas_snps, reversed_alleles_ref
                 df = pd.concat(all_dfs, ignore_index=True)
             else:
                 df = _supergnova_global(bfile1, bfile2, partition, thread, gwas_snps, reversed_alleles_ref, n1, n2)
-        
-        return df
+        total_m = np.sum(df['m'])
+        global_Cov = total_m / sqrt(n1 * n2) * np.sum(df['numerator'] / np.sum(df['denominator']))
+        results = pd.DataFrame(OrderedDict({"rho":[global_Cov], "m":[total_m]}))
+        return results
     
     else:
         if '@' in bfile1:
