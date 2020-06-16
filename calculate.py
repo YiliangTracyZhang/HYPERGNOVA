@@ -184,7 +184,7 @@ def _supergnova(bfile1, bfile2, partition, thread, gwas_snps, reversed_alleles_r
         results.append(result)
     pool = multiprocessing.Pool(processes = thread)
     for i in range(blockN):
-        pool.apply_async(calGlobalCov, args=(i, tmp_partition, geno_array1, geno_array2, coords, 
+        pool.apply_async(calLocalCov, args=(i, tmp_partition, geno_array1, geno_array2, coords, 
             bps, tmp_gwas_snps, tmp_flip, n1, n2),
             callback=collect_results)
     pool.close()
